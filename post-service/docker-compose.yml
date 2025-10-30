@@ -8,10 +8,12 @@ services:
       MYSQL_PASSWORD: blog
       MYSQL_ROOT_PASSWORD: root
     ports:
-      - "3307:3307"   # host:container
-    command: ["--default-authentication-plugin=caching_sha2_password","--port=3307"]
+      - "3307:3306"   # host:container (externa:interna)
+    command: ["--default-authentication-plugin=caching_sha2_password"]
+    # command: ["--default-authentication-plugin=caching_sha2_password","--port=3307"]    
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "blog", "-pblog", "-P", "3307"]
+      # test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "blog", "-pblog", "-P", "3307"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "blog", "-pblog"]
       interval: 5s
       timeout: 3s
       retries: 10
