@@ -18,6 +18,7 @@ public class EmailNotificationService {
         this.emailServiceClient = emailServiceClient;
     }
 
+    @org.springframework.scheduling.annotation.Async
     public void notifyPostCreated(Post post) {
         try {
             String subject = "Novo Post Criado: " + post.getTitle();
@@ -36,6 +37,7 @@ public class EmailNotificationService {
         } catch (Exception e) {
             logger.error("Erro ao enviar email para {}: {}", 
                         post.getAuthor().getEmail(), e.getMessage());
+            // Email falhou, mas não afeta a criação do post
         }
     }
 

@@ -62,15 +62,9 @@ management:
       enabled: true
     mongo:
       enabled: true
-
-# Observability configurations
-management:
   tracing:
     sampling:
       probability: 1.0  # 100% tracing for development
   zipkin:
     tracing:
       endpoint: http://zipkin:9411/api/v2/spans
-spring:
-  profiles:
-    active: prod
