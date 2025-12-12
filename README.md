@@ -65,3 +65,7 @@ O sistema inclui observabilidade com:
 **INSTITUTO INFNET**
 
 **GRADUAÇÃO EM ENGENHARIA DE SOFTWARE**
+
+## Video de Apresentação
+
+https://drive.google.com/file/d/1p7s-6iNOVtnEkwX3Ssf5u8TDome_AtJQ/view?usp=sharing
