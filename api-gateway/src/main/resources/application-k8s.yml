@@ -1,0 +1,126 @@
+# Configuração para ambiente Kubernetes
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  main:
+    web-application-type: reactive
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+      cache:
+        enabled: true
+        ttl: 35s
+      health-check:
+        initial-delay: 0
+        interval: 25s
+    gateway:
+      httpclient:
+        connect-timeout: 2000
+        response-timeout: 10s
+      globalcors:
+        corsConfigurations:
+          "[/**]":
+            allowedOriginPatterns: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+      routes:
+        - id: blog-service
+          uri: lb://blog
+          predicates:
+            - Path=/api/v1/posts/**,/api/v1/categories/**,/api/v1/authors/**
+          filters:
+            - StripPrefix=0
+            - name: CircuitBreaker
+              args:
+                name: blog-service
+                fallbackUri: forward:/fallback/blog-service
+            - name: Retry
+              args:
+                retries: 3
+                methods: GET,POST,PUT,DELETE
+
+        - id: email-service
+          uri: lb://email-service
+          predicates:
+            - Path=/api/v1/emails/**
+          filters:
+            - StripPrefix=0
+            - name: Retry
+              args:
+                retries: 2
+                methods: GET,POST
+
+        - id: login-service
+          uri: lb://login-service
+          predicates:
+            - Path=/api/v1/auth/**,/api/v1/users/**
+          filters:
+            - StripPrefix=0
+            - name: CircuitBreaker
+              args:
+                name: login-service
+                fallbackUri: forward:/fallback/login-service
+            - name: Retry
+              args:
+                retries: 3
+                methods: GET,POST,PUT
+
+# Configuração do Eureka para ambiente K8s
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+    hostname: ${HOSTNAME:api-gateway}
+
+# Circuit Breaker configuration
+resilience4j:
+  circuitbreaker:
+    instances:
+      default:
+        sliding-window-size: 10
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-type: TIME_BASED
+        minimum-number-of-calls: 5
+        wait-duration-in-open-state: 10s
+        failure-rate-threshold: 60
+        slow-call-duration-threshold: 5s
+        slow-call-rate-threshold: 60
+
+# Management and monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway,prometheus
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Logging
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
+    root: INFO

@@ -1,0 +1,49 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: email-service # Nome consistente para Eureka
+
+  # Configuração específica para K8s
+  datasource:
+    username: admin
+    password: admin
+    url: jdbc:mysql://mysql-service:3306/email_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false # Reduzir logs em prod
+
+  # Configuração do servidor de e-mail
+  mail:
+    host: "sandbox.smtp.mailtrap.io"
+    port: 2525
+    username: f0096b0dbf698b
+    password: 16709d029b8064
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# Registro no Eureka para K8s
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
+  instance:
+    prefer-ip-address: true
+    hostname: ${spring.application.name}
+
+# Configurações do Actuator para health checks
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

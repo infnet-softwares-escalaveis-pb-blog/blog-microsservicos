@@ -1,0 +1,64 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: email-service
+  datasource:
+    username: admin # usuario banco
+    password: admin # senha banco
+    url: jdbc:mysql://mysql:3306/email_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  sql:
+    init:
+      mode: never
+
+  # Configuração do servidor de e-mail (Mailtrap)
+  mail:
+    host: "sandbox.smtp.mailtrap.io"
+    port: 2525
+    username: f0096b0dbf698b
+    password: 16709d029b8064
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# Configuração Eureka Client
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+# Observability configurations
+management:
+  tracing:
+    sampling:
+      probability: 1.0  # 100% tracing for development
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
+spring:
+  profiles:
+    active: prod
+
+# Management and monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

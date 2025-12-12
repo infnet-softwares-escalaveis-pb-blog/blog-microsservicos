@@ -1,0 +1,45 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: email_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3307:3306"  # host(pc) : container
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - backend
+
+  email-service:
+    build: .
+    container_name: email-service
+    depends_on:
+      mysql:
+        condition: service_healthy  # espera o MySQL ficar pronto
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/email_db
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8083:8083"
+    networks:
+      - backend
+
+volumes:
+  mysql_data:
+
+# Rede interna dos containers
+networks:
+  backend:
+    driver: bridge
+# imagem mysql para copia dockerHub https://hub.docker.com/_/mysql

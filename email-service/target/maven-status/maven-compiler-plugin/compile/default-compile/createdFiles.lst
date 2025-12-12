@@ -1,0 +1,7 @@
+com\blogpessoal\email_service\exception\GlobalExceptionHandler.class
+com\blogpessoal\email_service\service\EmailService.class
+com\blogpessoal\email_service\config\OpenApiConfig.class
+com\blogpessoal\email_service\controller\EmailController.class
+com\blogpessoal\email_service\exception\EmailException.class
+com\blogpessoal\email_service\EmailServiceApplication.class
+com\blogpessoal\email_service\model\EmailRequest.class

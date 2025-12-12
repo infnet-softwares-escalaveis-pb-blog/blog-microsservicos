@@ -1,0 +1,76 @@
+spring:
+  application:
+    name: blog
+
+  # Configurações do Datasource MySQL
+  datasource:
+    url: jdbc:mysql://localhost:3306/blog_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: admin
+    password: admin
+
+  # Configurações JPA/Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+  # Configurações MongoDB
+  data:
+    mongodb:
+      uri: mongodb://root:123456@localhost:27017/blog_db?authSource=admin
+
+  # Console H2 (para testes)
+  h2:
+    console:
+      enabled: true
+
+# Configurações do servidor
+server:
+  port: 8081
+
+# Configurações CORS
+app:
+  cors:
+    allowed-origins: http://localhost:5173,http://localhost:3000
+    allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+    allowed-headers: "*"
+    exposed-headers: Location
+    allow-credentials: true
+    max-age: 1800
+
+# Registro no Eureka
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+# Configurações do Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  health:
+    db:
+      enabled: true
+    mongo:
+      enabled: true
+
+# Observability configurations
+management:
+  tracing:
+    sampling:
+      probability: 1.0  # 100% tracing for development
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
+spring:
+  profiles:
+    active: prod
